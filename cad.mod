@@ -34,8 +34,13 @@ TITLE decay of internal calcium concentration
 :  factor 10000 is replaced by 10000/18 needed in ca entry
 :  taur --rate of calcium removal-- is replaced by taur*7 (7 times faster) 
 
-
-INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
+: 20150524 NTC
+: Fixed ca initialization by inserting cai = ca into INITIAL block.
+: Changed integration method from euler to derivimplicit
+: which is appropriate for simple ion accumulation mechanisms.
+: See
+: Integration methods for SOLVE statements
+: http://www.neuron.yale.edu/phpBB/viewtopic.php?f=28&t=592
 
 NEURON {
 	SUFFIX cad
@@ -67,6 +72,7 @@ STATE {
 
 INITIAL {
 	ca = cainf
+  cai = ca
 }
 
 ASSIGNED {
@@ -79,20 +85,11 @@ BREAKPOINT {
 }
 
 DERIVATIVE state { 
-
 	drive_channel =  - (10000) * ica / (2 * FARADAY * depth)
 	if (drive_channel <= 0.) { drive_channel = 0.  }   : cannot pump inward 
          
 	ca' = drive_channel/18 + (cainf-ca)/(taur*7)
       : ca' = drive_channel/20 + (cainf -ca)/(taur*9)
-       
-  
-
 	cai = ca
 }
-
-
-
-
-
 
